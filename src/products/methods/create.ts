@@ -8,7 +8,7 @@ const generateUUID = () => crypto.randomBytes(16).toString('hex');
 const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient) => {
 	const { title } = event.body && JSON.parse(event.body);
 	const params = {
-		TableName: process.env.AWS_PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
+		TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
 		Item: {
 			// Creating an Item with a unique id and with the passed title
 			id: generateUUID(),

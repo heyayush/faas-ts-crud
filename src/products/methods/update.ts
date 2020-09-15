@@ -5,7 +5,7 @@ const Update = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentCli
 	const id = segment;
 	const { title } = event.body && JSON.parse(event.body);
 	const params = {
-		TableName: process.env.AWS_PRODUCTS_TABLE_NAME || '',
+		TableName: process.env.PRODUCTS_TABLE_NAME || '',
 		Item: {
 			id: id,
 			title: title,

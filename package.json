@@ -12,7 +12,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"compile": "tsc",
 		"netlify-login": "netlify login",
-		"netlify-link": "netlify link"
+		"netlify-link": "netlify link",
+		"invoke": "netlify functions:invoke products"
 	},
 	"repository": {
 		"type": "git",

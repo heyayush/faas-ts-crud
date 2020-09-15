@@ -3,7 +3,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 
 const ReadAll = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient) => {
 	const params = {
-		TableName: process.env.AWS_PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
+		TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
 	};
 	try {
 		// Utilising the scan method to get all items in the table

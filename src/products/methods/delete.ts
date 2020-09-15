@@ -4,7 +4,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 const Delete = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient, segment: string) => {
 	const id = segment;
 	const params = {
-		TableName: process.env.AWS_PRODUCTS_TABLE_NAME || '',
+		TableName: process.env.PRODUCTS_TABLE_NAME || '',
 		Key: { id },
 	};
 

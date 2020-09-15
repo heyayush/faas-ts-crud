@@ -10,8 +10,14 @@ require('dotenv').config({
 	path: `.env.${activeEnv}`,
 });
 
+const myAWSConfig = new AWS.Config();
+myAWSConfig.update({
+	accessKeyId: process.env.AYUSH_ACCESS_KEY_ID,
+	secretAccessKey: process.env.AYUSH_SECRET_ACCESS_KEY,
+});
+
 // Create the DynamoDB service object
-const dbClient = new AWS.DynamoDB.DocumentClient();
+const dbClient = new AWS.DynamoDB.DocumentClient(myAWSConfig);
 
 const allowedOrigins = [
 	'https://heyayush.com',
@@ -31,14 +37,6 @@ const checkAllowedOrigins = (origin: string) => {
 	const isAllowedOrigin = allowedOrigins.indexOf(origin) > -1;
 	return isLocalhost || isAllowedOrigin;
 };
-
-const provideAwsCredentials = () => {
-	AWS.config.update({
-		accessKeyId: process.env.AWS_AYUSH_ACCESS_KEY_ID,
-		secretAccessKey: process.env.AWS_AYUSH_SECRET_ACCESS_KEY,
-	});
-};
-provideAwsCredentials();
 
 export const handler = (event: APIGatewayEvent, context: Context, callback: Callback) => {
 	const requestOrigin = event.headers.origin || event.headers.host;
