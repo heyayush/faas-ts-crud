@@ -4,8 +4,9 @@
 	"description": "Simple CRUD operations apis in typescript and deployed with netlify functions",
 	"main": "index.js",
 	"scripts": {
-		"build": "yarn run compile && yarn run copyfiles && yarn run npm-recursive && netlify functions:build --src functions",
+		"build": "yarn run clean && yarn run compile && yarn run copyfiles && yarn run npm-recursive && netlify functions:build --src functions",
 		"build-me": "netlify-lambda build --config ./webpack.functions.js src/products",
+		"clean": "rimraf functions",
 		"serve": "netlify-lambda serve --config ./webpack.functions.js src/products",
 		"list": "netlify functions:list",
 		"deploy": "yarn run build && netlify deploy -p",
@@ -56,7 +57,8 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "lint-staged"
+			"pre-commit": "lint-staged",
+			"pre-push": "yarn run deploy"
 		}
 	},
 	"lint-staged": {
