@@ -58,7 +58,7 @@
 	"husky": {
 		"hooks": {
 			"pre-commit": "lint-staged",
-			"pre-push": "yarn run deploy && git add functions && git commit --amend --no-edit"
+			"pre-push": "yarn run deploy && git add functions && exit 0 && git commit -m 'Adding functions build' --no-verify && git push --no-verify"
 		}
 	},
 	"lint-staged": {
