@@ -33,8 +33,3 @@ const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentCli
 };
 
 export default Create;
-
-// Test Data
-// {
-//     "body": "{\"title\": \"Harry Potter\"}"
-//   }
