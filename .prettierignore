@@ -1,0 +1,8 @@
+.cache
+.netlify
+.vscode
+package.json
+package-lock.json
+yarn.lock
+public
+functions
