@@ -14,6 +14,7 @@ const myAWSConfig = new AWS.Config();
 myAWSConfig.update({
 	accessKeyId: process.env.AYUSH_ACCESS_KEY_ID,
 	secretAccessKey: process.env.AYUSH_SECRET_ACCESS_KEY,
+	region: process.env.AYUSH_REGION,
 });
 
 // Create the DynamoDB service object
