@@ -43,13 +43,13 @@ Netlify-lambda vs Netlify dev
 
 Netlify-lambda
 
--   Uses webpack and babel
--   Bundles functions and their dependencies as a single js file.
--   Use netlify-lambda only if you need a build step. Here we need a build step to convert ts to js.
+- Uses webpack and babel
+- Bundles functions and their dependencies as a single js file.
+- Use netlify-lambda only if you need a build step. Here we need a build step to convert ts to js.
 
 Netlify dev
 
--   Suitable approach for deploying function as a zip instead of single js file.
+- Suitable approach for deploying function as a zip instead of single js file.
 
 Build and Deploy Challenges
 https://github.com/liady/webpack-node-externals
@@ -68,3 +68,17 @@ Solution 1-
 
 Solution 2-
 use netlify-lambda with webpack-node-externals to output a single js file and then use netlify dev to bundle that along with node modules as a zip
+
+## S3
+
+When you create a presigned URL for your object, you must provide your security credentials, specify a bucket name, an object key, specify the HTTP method (GET to download the object) and expiration date and time. The presigned URLs are valid only for the specified duration.
+
+### using presigned url to access the files
+
+FE will make a req to get signed urls lambda function will return those signed urls
+FE will make a `PUT` req to upload file with that signed url
+FE sends the file id to back-end for receiving that file
+
+### Image optimization on S3 buckets.
+
+If an image is uploaded then a lambda function is automatically triggered which will compress that image.
