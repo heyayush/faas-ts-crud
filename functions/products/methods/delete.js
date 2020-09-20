@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Delete = async (event, dbClient, segment) => {
+const Delete = async (event, dbClient, segment, responseHeaders) => {
     const id = segment;
     const params = {
         TableName: process.env.PRODUCTS_TABLE_NAME || '',
@@ -11,6 +11,7 @@ const Delete = async (event, dbClient, segment) => {
         const response = {
             statusCode: 200,
             body: JSON.stringify(params.Key),
+            responseHeaders,
         };
         return response;
     }
@@ -18,6 +19,7 @@ const Delete = async (event, dbClient, segment) => {
         return {
             statusCode: 500,
             body: JSON.stringify(e),
+            responseHeaders,
         };
     }
 };

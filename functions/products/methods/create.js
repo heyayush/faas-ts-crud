@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = __importDefault(require("crypto"));
 // Generate unique id with no external dependencies
 const generateUUID = () => crypto_1.default.randomBytes(16).toString('hex');
-const Create = async (event, dbClient) => {
+const Create = async (event, dbClient, responseHeaders) => {
     const { title } = event.body && JSON.parse(event.body);
     const params = {
         TableName: process.env.PRODUCTS_TABLE_NAME || '',
@@ -22,6 +22,7 @@ const Create = async (event, dbClient) => {
         const response = {
             statusCode: 200,
             body: JSON.stringify(params.Item),
+            responseHeaders,
         };
         return response; // Returning a 200 if the item has been inserted
     }
@@ -29,6 +30,7 @@ const Create = async (event, dbClient) => {
         return {
             statusCode: 500,
             body: JSON.stringify(e),
+            responseHeaders,
         };
     }
 };

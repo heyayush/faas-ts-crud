@@ -48,44 +48,46 @@ exports.handler = (event, _, callback) => {
             },
         });
     }
-    // const headers = {
-    //   'Content-Type': 'application/json',
-    //   'Access-Control-Allow-Origin': requestOrigin,
-    // }
+    const responseHeaders = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': requestOrigin,
+    };
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');
     const segments = path.split('/').filter((e) => e);
     switch (event.httpMethod) {
         case 'GET':
             /* GET /.netlify/functions/api */
             if (segments.length === 0) {
-                return methods_1.ReadAll(event, dbClient);
+                return methods_1.ReadAll(event, dbClient, responseHeaders);
             }
             /* GET /.netlify/functions/api/123456 */
             if (segments.length === 1) {
                 // event.id = segments[0];
-                return methods_1.Read(event, dbClient, segments[0]);
+                return methods_1.Read(event, dbClient, segments[0], responseHeaders);
             }
             else {
                 return {
                     statusCode: 500,
                     body: 'too many segments in GET request',
+                    responseHeaders,
                 };
             }
             break;
         /* POST /.netlify/functions/api */
         case 'POST':
-            return methods_1.Create(event, dbClient);
+            return methods_1.Create(event, dbClient, responseHeaders);
             break;
         /* PUT /.netlify/functions/api/123456 */
         case 'PUT':
             if (segments.length === 1) {
                 // event.id = segments[0];
-                return methods_1.Update(event, dbClient, segments[0]);
+                return methods_1.Update(event, dbClient, segments[0], responseHeaders);
             }
             else {
                 return {
                     statusCode: 500,
                     body: 'invalid segments in POST request, must be /.netlify/functions/api/123456',
+                    responseHeaders,
                 };
             }
             break;
@@ -93,12 +95,13 @@ exports.handler = (event, _, callback) => {
         case 'DELETE':
             if (segments.length === 1) {
                 // event.id = segments[0];
-                return methods_1.Delete(event, dbClient, segments[0]);
+                return methods_1.Delete(event, dbClient, segments[0], responseHeaders);
             }
             else {
                 return {
                     statusCode: 500,
                     body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
+                    responseHeaders,
                 };
             }
             break;
@@ -107,6 +110,7 @@ exports.handler = (event, _, callback) => {
             return {
                 statusCode: 500,
                 body: 'unrecognized HTTP Method, must be one of GET/POST/PUT/DELETE',
+                responseHeaders,
             };
     }
 };
