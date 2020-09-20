@@ -1,7 +1,13 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent } from 'aws-lambda'
+import { OutgoingHttpHeaders } from 'http'
 
-const Read = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient, segment: string) => {
+const Read = async (
+  event: APIGatewayEvent,
+  dbClient: AWS.DynamoDB.DocumentClient,
+  segment: string,
+  responseHeaders: OutgoingHttpHeaders
+) => {
   const id = segment
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
@@ -13,11 +19,13 @@ const Read = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClien
     const response = {
       statusCode: 200,
       body: JSON.stringify(data.Item),
+      responseHeaders,
     }
     return response
   } catch (e) {
     return {
       statusCode: 500,
+      responseHeaders,
     }
   }
 }

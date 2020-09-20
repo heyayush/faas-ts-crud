@@ -1,7 +1,13 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent } from 'aws-lambda'
+import { OutgoingHttpHeaders } from 'http'
 
-const Delete = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient, segment: string) => {
+const Delete = async (
+  event: APIGatewayEvent,
+  dbClient: AWS.DynamoDB.DocumentClient,
+  segment: string,
+  responseHeaders: OutgoingHttpHeaders
+) => {
   const id = segment
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '',
@@ -13,12 +19,14 @@ const Delete = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentCli
     const response = {
       statusCode: 200,
       body: JSON.stringify(params.Key),
+      responseHeaders,
     }
     return response
   } catch (e) {
     return {
       statusCode: 500,
       body: JSON.stringify(e),
+      responseHeaders,
     }
   }
 }

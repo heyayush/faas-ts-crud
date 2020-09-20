@@ -1,11 +1,16 @@
 import AWS from 'aws-sdk'
 import crypto from 'crypto'
 import { APIGatewayEvent } from 'aws-lambda'
+import { OutgoingHttpHeaders } from 'http'
 
 // Generate unique id with no external dependencies
 const generateUUID = () => crypto.randomBytes(16).toString('hex')
 
-const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient) => {
+const Create = async (
+  event: APIGatewayEvent,
+  dbClient: AWS.DynamoDB.DocumentClient,
+  responseHeaders: OutgoingHttpHeaders
+) => {
   const { title } = event.body && JSON.parse(event.body)
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
@@ -22,12 +27,14 @@ const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentCli
     const response = {
       statusCode: 200,
       body: JSON.stringify(params.Item),
+      responseHeaders,
     }
     return response // Returning a 200 if the item has been inserted
   } catch (e) {
     return {
       statusCode: 500,
       body: JSON.stringify(e),
+      responseHeaders,
     }
   }
 }
