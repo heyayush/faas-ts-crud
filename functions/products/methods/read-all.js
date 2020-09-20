@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ReadAll = async (event, dbClient, responseHeaders) => {
+const ReadAll = async (event, dbClient, headers) => {
     const params = {
         TableName: process.env.PRODUCTS_TABLE_NAME || '',
     };
@@ -10,14 +10,14 @@ const ReadAll = async (event, dbClient, responseHeaders) => {
         const response = {
             statusCode: 200,
             body: JSON.stringify(data.Items),
-            responseHeaders,
+            headers,
         };
         return response;
     }
     catch (e) {
         return {
             statusCode: 500,
-            responseHeaders,
+            headers,
         };
     }
 };

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Update = async (event, dbClient, segment, responseHeaders) => {
+const Update = async (event, dbClient, segment, headers) => {
     const id = segment;
     const { title } = event.body && JSON.parse(event.body);
     const params = {
@@ -15,14 +15,14 @@ const Update = async (event, dbClient, segment, responseHeaders) => {
         const response = {
             statusCode: 200,
             body: JSON.stringify(params.Item),
-            responseHeaders,
+            headers,
         };
         return response;
     }
     catch (e) {
         return {
             statusCode: 500,
-            responseHeaders,
+            headers,
         };
     }
 };

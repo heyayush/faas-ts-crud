@@ -6,7 +6,7 @@ const Delete = async (
   event: APIGatewayEvent,
   dbClient: AWS.DynamoDB.DocumentClient,
   segment: string,
-  responseHeaders: OutgoingHttpHeaders
+  headers: OutgoingHttpHeaders
 ) => {
   const id = segment
   const params = {
@@ -19,14 +19,14 @@ const Delete = async (
     const response = {
       statusCode: 200,
       body: JSON.stringify(params.Key),
-      responseHeaders,
+      headers,
     }
     return response
   } catch (e) {
     return {
       statusCode: 500,
       body: JSON.stringify(e),
-      responseHeaders,
+      headers,
     }
   }
 }

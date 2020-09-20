@@ -6,7 +6,7 @@ const Update = async (
   event: APIGatewayEvent,
   dbClient: AWS.DynamoDB.DocumentClient,
   segment: string,
-  responseHeaders: OutgoingHttpHeaders
+  headers: OutgoingHttpHeaders
 ) => {
   const id = segment
   const { title } = event.body && JSON.parse(event.body)
@@ -22,13 +22,13 @@ const Update = async (
     const response = {
       statusCode: 200,
       body: JSON.stringify(params.Item),
-      responseHeaders,
+      headers,
     }
     return response
   } catch (e) {
     return {
       statusCode: 500,
-      responseHeaders,
+      headers,
     }
   }
 }

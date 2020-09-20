@@ -44,17 +44,17 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
   const requestOrigin = event.headers.origin || event.headers.host
 
   if (!checkAllowedOrigins(requestOrigin)) {
-    console.error('Origin not allowed')
+    console.error(`Origin ${requestOrigin} is not allowed`)
     callback(null, {
       statusCode: 401,
-      body: 'Unauthorized origin',
+      body: `Unauthorized origin ${requestOrigin}`,
       headers: {
         'Content-Type': 'text/plain',
       },
     })
   }
 
-  const responseHeaders = {
+  const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': requestOrigin,
   }
@@ -66,34 +66,34 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
     case 'GET':
       /* GET /.netlify/functions/api */
       if (segments.length === 0) {
-        return ReadAll(event, dbClient, responseHeaders)
+        return ReadAll(event, dbClient, headers)
       }
       /* GET /.netlify/functions/api/123456 */
       if (segments.length === 1) {
         // event.id = segments[0];
-        return Read(event, dbClient, segments[0], responseHeaders)
+        return Read(event, dbClient, segments[0], headers)
       } else {
         return {
           statusCode: 500,
           body: 'too many segments in GET request',
-          responseHeaders,
+          headers,
         }
       }
       break
     /* POST /.netlify/functions/api */
     case 'POST':
-      return Create(event, dbClient, responseHeaders)
+      return Create(event, dbClient, headers)
       break
     /* PUT /.netlify/functions/api/123456 */
     case 'PUT':
       if (segments.length === 1) {
         // event.id = segments[0];
-        return Update(event, dbClient, segments[0], responseHeaders)
+        return Update(event, dbClient, segments[0], headers)
       } else {
         return {
           statusCode: 500,
           body: 'invalid segments in POST request, must be /.netlify/functions/api/123456',
-          responseHeaders,
+          headers,
         }
       }
       break
@@ -101,12 +101,12 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
     case 'DELETE':
       if (segments.length === 1) {
         // event.id = segments[0];
-        return Delete(event, dbClient, segments[0], responseHeaders)
+        return Delete(event, dbClient, segments[0], headers)
       } else {
         return {
           statusCode: 500,
           body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
-          responseHeaders,
+          headers,
         }
       }
       break
@@ -115,7 +115,7 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
       return {
         statusCode: 500,
         body: 'unrecognized HTTP Method, must be one of GET/POST/PUT/DELETE',
-        responseHeaders,
+        headers,
       }
   }
 }

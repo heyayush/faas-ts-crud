@@ -6,11 +6,7 @@ import { OutgoingHttpHeaders } from 'http'
 // Generate unique id with no external dependencies
 const generateUUID = () => crypto.randomBytes(16).toString('hex')
 
-const Create = async (
-  event: APIGatewayEvent,
-  dbClient: AWS.DynamoDB.DocumentClient,
-  responseHeaders: OutgoingHttpHeaders
-) => {
+const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient, headers: OutgoingHttpHeaders) => {
   const { title } = event.body && JSON.parse(event.body)
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
@@ -27,14 +23,14 @@ const Create = async (
     const response = {
       statusCode: 200,
       body: JSON.stringify(params.Item),
-      responseHeaders,
+      headers,
     }
     return response // Returning a 200 if the item has been inserted
   } catch (e) {
     return {
       statusCode: 500,
       body: JSON.stringify(e),
-      responseHeaders,
+      headers,
     }
   }
 }
