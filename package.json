@@ -5,9 +5,9 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "yarn run clean && yarn run compile && yarn run copyfiles && yarn run npm-recursive && netlify functions:build --src functions",
-		"build-me": "netlify-lambda build --config ./webpack.functions.js src/s3",
+		"build-me": "netlify-lambda build --config ./webpack.functions.js src/products",
 		"clean": "rimraf functions",
-		"serve": "netlify-lambda serve --config ./webpack.functions.js src/s3",
+		"serve": "netlify-lambda serve --config ./webpack.functions.js functions/products",
 		"list": "netlify functions:list",
 		"deploy": "yarn run build && netlify deploy -p",
 		"test": "echo \"Error: no test specified\" && exit 1",

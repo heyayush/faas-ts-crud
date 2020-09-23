@@ -9,12 +9,13 @@ const Update = async (
   headers: OutgoingHttpHeaders
 ) => {
   const id = segment
-  const { title } = event.body && JSON.parse(event.body)
+  const { label, url } = event.body && JSON.parse(event.body)
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '',
     Item: {
       id: id,
-      title: title,
+      label: label,
+      url: url,
     },
   }
   try {

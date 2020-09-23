@@ -7,13 +7,14 @@ const crypto_1 = __importDefault(require("crypto"));
 // Generate unique id with no external dependencies
 const generateUUID = () => crypto_1.default.randomBytes(16).toString('hex');
 const Create = async (event, dbClient, headers) => {
-    const { title } = event.body && JSON.parse(event.body);
+    const { label, url } = event.body && JSON.parse(event.body);
     const params = {
         TableName: process.env.PRODUCTS_TABLE_NAME || '',
         Item: {
             // Creating an Item with a unique id and with the passed title
             id: generateUUID(),
-            title: title,
+            label: label,
+            url: url,
         },
     };
     try {
