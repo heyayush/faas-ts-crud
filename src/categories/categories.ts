@@ -20,7 +20,7 @@ myAWSConfig.update({
 
 // Create the DynamoDB service object
 const dbClient = new AWS.DynamoDB.DocumentClient(myAWSConfig)
-const tableName = process.env.PRODUCTS_TABLE_NAME || ''
+const tableName = process.env.CATEGORIES_TABLE_NAME || ''
 
 const allowedOrigins = [
   'https://heyayush.com',
