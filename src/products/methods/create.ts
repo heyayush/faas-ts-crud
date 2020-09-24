@@ -1,19 +1,25 @@
 import AWS from 'aws-sdk'
-import crypto from 'crypto'
 import { APIGatewayEvent } from 'aws-lambda'
 import { OutgoingHttpHeaders } from 'http'
-
-// Generate unique id with no external dependencies
-const generateUUID = () => crypto.randomBytes(16).toString('hex')
+import slugify from 'slugify'
+import { v4 as uuidv4 } from 'uuid'
 
 const Create = async (event: APIGatewayEvent, dbClient: AWS.DynamoDB.DocumentClient, headers: OutgoingHttpHeaders) => {
-  const { label, url } = event.body && JSON.parse(event.body)
+  const { name } = event.body && JSON.parse(event.body)
+  const slugifyOptions = {
+    lower: true,
+    strict: true,
+    replacement: '-',
+  }
+  const sanitizedName = name.replace(/[^a-zA-Z0-9 ]/g, '')
+  const url = slugify(sanitizedName, slugifyOptions) // TODO: check if this url is unique
+
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME || '', // The name of your DynamoDB table
     Item: {
       // Creating an Item with a unique id and with the passed title
-      id: generateUUID(),
-      label: label,
+      id: uuidv4(),
+      name: sanitizedName,
       url: url,
     },
   }
