@@ -10,13 +10,18 @@ const Update = async (
   headers: OutgoingHttpHeaders
 ) => {
   const id = segment
-  const { label, url } = event.body && JSON.parse(event.body)
+  const { name, category, primaryImage, pics, description, price } = event.body && JSON.parse(event.body)
+  // Needs Testing
   const params = {
     TableName: tableName,
     Item: {
       id: id,
-      name: label,
-      url: url,
+      name,
+      category,
+      primaryImage,
+      pics,
+      description,
+      price,
     },
   }
   try {

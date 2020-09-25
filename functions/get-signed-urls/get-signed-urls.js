@@ -36,7 +36,7 @@ const checkAllowedOrigins = (origin) => {
     const isAllowedOrigin = allowedOrigins.indexOf(origin) > -1;
     return isLocalhost || isAllowedOrigin;
 };
-const GetSignedUrl = async (_, s3Client) => {
+const getSignedUrl = async (_, headers, s3Client) => {
     const generateUUID = () => crypto_1.default.randomBytes(16).toString('hex');
     const id = generateUUID();
     const params = {
@@ -49,6 +49,7 @@ const GetSignedUrl = async (_, s3Client) => {
         const data = await s3Client.getSignedUrlPromise('putObject', params);
         const response = {
             statusCode: 200,
+            headers,
             body: JSON.stringify({ url: data, id: id }),
         };
         return response;
@@ -56,6 +57,7 @@ const GetSignedUrl = async (_, s3Client) => {
     catch (e) {
         return {
             statusCode: 500,
+            headers,
         };
     }
 };
@@ -73,17 +75,16 @@ exports.handler = (event, _, callback) => {
             },
         });
     }
-    // const responseHeaders = {
-    //   'Content-Type': 'application/json',
-    //   'Access-Control-Allow-Origin': requestOrigin,
-    // }
+    const headers = {
+        'Access-Control-Allow-Origin': requestOrigin,
+    };
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');
     const segments = path.split('/').filter((e) => e);
     switch (event.httpMethod) {
         case 'GET':
             /* GET /.netlify/functions/api */
             if (segments.length === 0) {
-                return GetSignedUrl(event, s3Client);
+                return getSignedUrl(event, headers, s3Client);
             }
             /* GET /.netlify/functions/api/123456 */
             //   if (segments.length === 1) {
@@ -93,6 +94,7 @@ exports.handler = (event, _, callback) => {
             else {
                 return {
                     statusCode: 500,
+                    headers,
                     body: 'too many segments in GET request',
                 };
             }
@@ -101,6 +103,7 @@ exports.handler = (event, _, callback) => {
         default:
             return {
                 statusCode: 500,
+                headers,
                 body: 'unrecognized HTTP Method, must be a GET request',
             };
     }

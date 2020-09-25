@@ -82,3 +82,10 @@ FE sends the file id to back-end for receiving that file
 ### Image optimization on S3 buckets.
 
 If an image is uploaded then a lambda function is automatically triggered which will compress that image.
+
+## get-signed-urls
+
+get request returns an object with url and id
+then send a put request with file on that url
+
+Adding CORS configuration in the S3 bucket

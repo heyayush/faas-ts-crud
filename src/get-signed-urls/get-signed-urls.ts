@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda'
 import crypto from 'crypto'
+import { OutgoingHttpHeaders } from 'http'
 
 const activeEnv = process.env.ACTIVE_ENV || process.env.NODE_ENV || 'development'
 
@@ -40,7 +41,7 @@ const checkAllowedOrigins = (origin: string) => {
   return isLocalhost || isAllowedOrigin
 }
 
-const GetSignedUrl = async (_: APIGatewayEvent, s3Client: AWS.S3) => {
+const getSignedUrl = async (_: APIGatewayEvent, headers: OutgoingHttpHeaders, s3Client: AWS.S3) => {
   const generateUUID = () => crypto.randomBytes(16).toString('hex')
   const id = generateUUID()
   const params = {
@@ -53,12 +54,14 @@ const GetSignedUrl = async (_: APIGatewayEvent, s3Client: AWS.S3) => {
     const data = await s3Client.getSignedUrlPromise('putObject', params)
     const response = {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ url: data, id: id }),
     }
     return response
   } catch (e) {
     return {
       statusCode: 500,
+      headers,
     }
   }
 }
@@ -80,10 +83,10 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
     })
   }
 
-  // const responseHeaders = {
-  //   'Content-Type': 'application/json',
-  //   'Access-Control-Allow-Origin': requestOrigin,
-  // }
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': requestOrigin,
+  }
 
   const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '')
   const segments = path.split('/').filter((e) => e)
@@ -92,7 +95,7 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
     case 'GET':
       /* GET /.netlify/functions/api */
       if (segments.length === 0) {
-        return GetSignedUrl(event, s3Client)
+        return getSignedUrl(event, headers, s3Client)
       }
       /* GET /.netlify/functions/api/123456 */
       //   if (segments.length === 1) {
@@ -102,6 +105,7 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
       else {
         return {
           statusCode: 500,
+          headers,
           body: 'too many segments in GET request',
         }
       }
@@ -110,6 +114,7 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
     default:
       return {
         statusCode: 500,
+        headers,
         body: 'unrecognized HTTP Method, must be a GET request',
       }
   }

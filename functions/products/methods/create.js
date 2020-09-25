@@ -5,22 +5,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const slugify_1 = __importDefault(require("slugify"));
 const uuid_1 = require("uuid");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const RESERVED_WORDS = ['new'];
 const Create = async (event, dbClient, tableName, headers) => {
-    const { name } = event.body && JSON.parse(event.body);
+    const { name, category, primaryImage, pics, description, price } = event.body && JSON.parse(event.body);
     const slugifyOptions = {
         lower: true,
         strict: true,
         replacement: '-',
     };
     const sanitizedName = name.replace(/[^a-zA-Z0-9 ]/g, '');
-    const url = slugify_1.default(sanitizedName, slugifyOptions); // TODO: check if this url is unique
+    const url = slugify_1.default(sanitizedName, slugifyOptions); // TODO: check if this url is unique and is not one of reserved words
     const params = {
         TableName: tableName,
         Item: {
             // Creating an Item with a unique id and with the passed title
             id: uuid_1.v4(),
             name: sanitizedName,
-            url: url,
+            url,
+            category,
+            primaryImage,
+            pics,
+            description,
+            price,
         },
     };
     try {
