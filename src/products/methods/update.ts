@@ -1,43 +1,45 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent } from 'aws-lambda'
 import { OutgoingHttpHeaders } from 'http'
+import flatUpdateParams from '../utils/flatupdateParams'
 
 const Update = async (
   event: APIGatewayEvent,
   dbClient: AWS.DynamoDB.DocumentClient,
-  segment: string,
   tableName: string,
   headers: OutgoingHttpHeaders
 ) => {
-  const id = segment
-  const { name, category, primaryImage, pics, description, price } = event.body && JSON.parse(event.body)
+  console.log('update initiated')
+
+  const { id, ...rest } = event.body && JSON.parse(event.body)
+  console.log('data received', id, rest)
+
   // Needs Testing
-  const params = {
+  const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
     TableName: tableName,
-    Item: {
+    Key: {
       id: id,
-      name,
-      category,
-      primaryImage,
-      pics,
-      description,
-      price,
     },
+    ...flatUpdateParams(rest),
+    ReturnValues: 'ALL_NEW',
   }
-  try {
-    await dbClient.put(params).promise()
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(params.Item),
-      headers,
+  dbClient.update(params, function (err, data) {
+    if (err) {
+      console.log('Error', err)
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify(err),
+      }
+    } else {
+      console.log('Success', data)
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(data),
+      }
     }
-    return response
-  } catch (e) {
-    return {
-      statusCode: 500,
-      headers,
-    }
-  }
+  })
 }
 
 export default Update

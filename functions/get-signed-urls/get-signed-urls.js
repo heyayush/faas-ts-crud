@@ -76,6 +76,7 @@ exports.handler = (event, _, callback) => {
         });
     }
     const headers = {
+        'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': requestOrigin,
     };
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');

@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent } from 'aws-lambda'
 import { OutgoingHttpHeaders } from 'http'
-import slugify from 'slugify'
-import { v4 as uuidv4 } from 'uuid'
+import getId from '../utils/getId'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RESERVED_WORDS = ['new']
@@ -13,27 +12,16 @@ const Create = async (
   tableName: string,
   headers: OutgoingHttpHeaders
 ) => {
-  const { name, category, primaryImage, pics, description, price } = event.body && JSON.parse(event.body)
-  const slugifyOptions = {
-    lower: true,
-    strict: true,
-    replacement: '-',
-  }
+  const { name, ...rest } = event.body && JSON.parse(event.body)
   const sanitizedName = name.replace(/[^a-zA-Z0-9 ]/g, '')
-  const url = slugify(sanitizedName, slugifyOptions) // TODO: check if this url is unique and is not one of reserved words
 
   const params = {
     TableName: tableName, // The name of your DynamoDB table
     Item: {
       // Creating an Item with a unique id and with the passed title
-      id: uuidv4(),
+      id: getId(),
       name: sanitizedName,
-      url,
-      category,
-      primaryImage,
-      pics,
-      description,
-      price,
+      ...rest,
     },
   }
 

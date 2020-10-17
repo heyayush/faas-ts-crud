@@ -39,23 +39,39 @@ const checkAllowedOrigins = (origin) => {
 };
 exports.handler = (event, _, callback) => {
     const requestOrigin = event.headers.origin || event.headers.host;
+    console.log('request from', requestOrigin);
+    console.log('method', event.httpMethod);
     if (!checkAllowedOrigins(requestOrigin)) {
         console.error(`Origin ${requestOrigin} is not allowed`);
         callback(null, {
             statusCode: 401,
-            body: `Unauthorized origin ${requestOrigin}`,
+            body: `This is unauthorized origin ${requestOrigin}`,
             headers: {
                 'Content-Type': 'text/plain',
             },
         });
     }
     const headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': requestOrigin,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Headers': '*',
     };
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');
     const segments = path.split('/').filter((e) => e);
+    const optionReqHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': '*',
+    };
     switch (event.httpMethod) {
+        case 'OPTIONS':
+            console.log('triggering options request');
+            return {
+                statusCode: 204,
+                headers: { ...optionReqHeaders },
+                body: {},
+            };
+            break;
         case 'GET':
             /* GET /.netlify/functions/api */
             if (segments.length === 0) {
@@ -80,17 +96,8 @@ exports.handler = (event, _, callback) => {
             break;
         /* PUT /.netlify/functions/api/123456 */
         case 'PUT':
-            if (segments.length === 1) {
-                // event.id = segments[0];
-                return methods_1.Update(event, dbClient, segments[0], tableName, headers);
-            }
-            else {
-                return {
-                    statusCode: 500,
-                    body: 'invalid segments in POST request, must be /.netlify/functions/api/123456',
-                    headers,
-                };
-            }
+            console.log('switching to update function');
+            return methods_1.Update(event, dbClient, tableName, headers);
             break;
         /* DELETE /.netlify/functions/api/123456 */
         case 'DELETE':
@@ -115,3 +122,4 @@ exports.handler = (event, _, callback) => {
             };
     }
 };
+// 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Content-Length, Authorization, Accept, Cache-Control,  Origin, Referer, X-Api-Key',
