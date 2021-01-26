@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const getId_1 = __importDefault(require("../utils/getId"));
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RESERVED_WORDS = ['new'];
-const Create = async (event, dbClient, tableName, headers) => {
+const Create = async (event, dbClient, tableName, headers, segment) => {
     const { name, ...rest } = event.body && JSON.parse(event.body);
     const sanitizedName = name.replace(/[^a-zA-Z0-9 ]/g, '');
     const params = {
         TableName: tableName,
         Item: {
             // Creating an Item with a unique id and with the passed title
-            id: getId_1.default(),
+            id: segment ? segment : getId_1.default(),
             name: sanitizedName,
             ...rest,
         },

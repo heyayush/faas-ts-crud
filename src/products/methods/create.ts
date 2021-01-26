@@ -10,7 +10,8 @@ const Create = async (
   event: APIGatewayEvent,
   dbClient: AWS.DynamoDB.DocumentClient,
   tableName: string,
-  headers: OutgoingHttpHeaders
+  headers: OutgoingHttpHeaders,
+  segment: string
 ) => {
   const { name, ...rest } = event.body && JSON.parse(event.body)
   const sanitizedName = name.replace(/[^a-zA-Z0-9 ]/g, '')
@@ -19,7 +20,7 @@ const Create = async (
     TableName: tableName, // The name of your DynamoDB table
     Item: {
       // Creating an Item with a unique id and with the passed title
-      id: getId(),
+      id: segment ? segment : getId(),
       name: sanitizedName,
       ...rest,
     },
