@@ -10,11 +10,7 @@ const Update = async (
   headers: OutgoingHttpHeaders,
   segment: string
 ) => {
-  console.log('update initiated')
-
-  const { id, ...rest } = event.body && JSON.parse(event.body)
-  console.log('data received', id, rest, 'segment', segment)
-  console.log('flat update params', flatUpdateParams(rest))
+  const { id, action, ...rest } = event.body && JSON.parse(event.body)
   // Needs Testing
   const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
     TableName: tableName,

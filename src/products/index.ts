@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk'
 import { APIGatewayEvent, Context, Callback } from 'aws-lambda'
 import { Create, Read, ReadAll, Update, Delete } from './methods'
-import { OutgoingHttpHeaders } from 'http'
 
 const activeEnv = process.env.ACTIVE_ENV || process.env.NODE_ENV || 'development'
 
@@ -93,8 +92,19 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
       /* GET /.netlify/functions/api/123456 */
       if (segments.length === 1) {
         // event.id = segments[0];
-        return Update(event, dbClient, tableName, headers, segments[0])
-        // return Update(event, dbClient, tableName, headers, segments[0])
+        const { action } = event.body && JSON.parse(event.body)
+        switch (action) {
+          case 'UPDATE':
+            return Update(event, dbClient, tableName, headers, segments[0])
+          case 'DELETE':
+            return Delete(event, dbClient, tableName, headers, segments[0])
+          default:
+            return {
+              statusCode: 500,
+              body: '"action" is missing',
+              headers,
+            }
+        }
       } else {
         return {
           statusCode: 500,
@@ -113,22 +123,27 @@ export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) 
       break
     /* DELETE /.netlify/functions/api/123456 */
     case 'DELETE':
-      if (segments.length === 1) {
-        // event.id = segments[0];
-        return Delete(event, dbClient, segments[0], tableName, headers)
-      } else {
-        return {
-          statusCode: 500,
-          body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
-          headers,
-        }
+      return {
+        statusCode: 500,
+        body: 'DELETE request is not allowed',
+        headers,
       }
+      // if (segments.length === 1) {
+      //   // event.id = segments[0];
+      //   return Delete(event, dbClient, tableName, headers, segments[0])
+      // } else {
+      //   return {
+      //     statusCode: 500,
+      //     body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
+      //     headers,
+      //   }
+      // }
       break
     /* Fallthrough case */
     default:
       return {
         statusCode: 500,
-        body: 'unrecognized HTTP Method, must be one of GET/POST/PUT/DELETE',
+        body: 'unrecognized HTTP Method, must be one of GET/POST',
         headers,
       }
   }
