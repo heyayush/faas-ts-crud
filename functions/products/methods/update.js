@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const flatupdateParams_1 = __importDefault(require("../utils/flatupdateParams"));
 const Update = async (event, dbClient, tableName, headers, segment) => {
     const { id, action, ...rest } = event.body && JSON.parse(event.body);
-    console.log('rest parameters', rest);
     // Needs Testing
     const params = {
         TableName: tableName,
@@ -17,7 +16,6 @@ const Update = async (event, dbClient, tableName, headers, segment) => {
         ReturnValues: 'ALL_NEW',
     };
     try {
-        console.log('updating params', params);
         const updatedData = await dbClient.update(params).promise();
         const response = {
             statusCode: 200,

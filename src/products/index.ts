@@ -23,10 +23,10 @@ const dbClient = new AWS.DynamoDB.DocumentClient(myAWSConfig)
 const tableName = process.env.PRODUCTS_TABLE_NAME || ''
 
 const allowedOrigins = [
-  'https://heyayush.com',
-  'https://www.heyayush.com',
-  'http://heyayush.com',
-  'http://heyayush.com',
+  'https://one-shop.netlify.app',
+  'https://www.one-shop.netlify.app',
+  'http://one-shop.netlify.app',
+  'http://one-shop.netlify.app',
 ]
 
 const checkLocalhost = (str: string) => {
