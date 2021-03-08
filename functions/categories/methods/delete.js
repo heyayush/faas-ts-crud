@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Delete = async (event, dbClient, segment, tableName, headers) => {
+// TODO: Modify Delete to actually add a flag is deleted instead of actually deleting that object.
+const Delete = async (event, dbClient, tableName, headers, segment) => {
     const id = segment;
     const params = {
         TableName: tableName,

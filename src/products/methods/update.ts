@@ -10,6 +10,7 @@ const Update = async (
   headers: OutgoingHttpHeaders,
   segment: string
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, action, ...rest } = event.body && JSON.parse(event.body)
   // Needs Testing
   const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {

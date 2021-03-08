@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const flatupdateParams_1 = __importDefault(require("../utils/flatupdateParams"));
 const Update = async (event, dbClient, tableName, headers, segment) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, action, ...rest } = event.body && JSON.parse(event.body);
     // Needs Testing
     const params = {

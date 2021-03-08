@@ -22,10 +22,10 @@ myAWSConfig.update({
 const dbClient = new aws_sdk_1.default.DynamoDB.DocumentClient(myAWSConfig);
 const tableName = process.env.CATEGORIES_TABLE_NAME || '';
 const allowedOrigins = [
-    'https://heyayush.com',
-    'https://www.heyayush.com',
-    'http://heyayush.com',
-    'http://heyayush.com',
+    'https://one-shop.netlify.app',
+    'https://www.one-shop.netlify.app',
+    'http://one-shop.netlify.app',
+    'http://one-shop.netlify.app',
 ];
 const checkLocalhost = (str) => {
     if (str) {
@@ -39,19 +39,22 @@ const checkAllowedOrigins = (origin) => {
 };
 exports.handler = (event, _, callback) => {
     const requestOrigin = event.headers.origin || event.headers.host;
+    console.log('request from', requestOrigin);
+    console.log('method', event.httpMethod);
     if (!checkAllowedOrigins(requestOrigin)) {
         console.error(`Origin ${requestOrigin} is not allowed`);
         callback(null, {
             statusCode: 401,
-            body: `Unauthorized origin ${requestOrigin}`,
+            body: `This is unauthorized origin ${requestOrigin}`,
             headers: {
                 'Content-Type': 'text/plain',
             },
         });
     }
     const headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': requestOrigin,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
     };
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');
     const segments = path.split('/').filter((e) => e);
@@ -76,42 +79,67 @@ exports.handler = (event, _, callback) => {
             break;
         /* POST /.netlify/functions/api */
         case 'POST':
-            return methods_1.Create(event, dbClient, tableName, headers);
+            if (segments.length === 0) {
+                return methods_1.Create(event, dbClient, tableName, headers, segments[0]);
+            }
+            /* GET /.netlify/functions/api/123456 */
+            if (segments.length === 1) {
+                // event.id = segments[0];
+                const { action } = event.body && JSON.parse(event.body);
+                switch (action) {
+                    case 'UPDATE':
+                        return methods_1.Update(event, dbClient, tableName, headers, segments[0]);
+                    case 'DELETE':
+                        return methods_1.Delete(event, dbClient, tableName, headers, segments[0]);
+                    default:
+                        return {
+                            statusCode: 500,
+                            body: '"action" is missing',
+                            headers,
+                        };
+                }
+            }
+            else {
+                return {
+                    statusCode: 500,
+                    body: 'too many segments in GET request',
+                    headers,
+                };
+            }
             break;
         /* PUT /.netlify/functions/api/123456 */
         case 'PUT':
-            if (segments.length === 1) {
-                // event.id = segments[0];
-                return methods_1.Update(event, dbClient, segments[0], tableName, headers);
-            }
-            else {
-                return {
-                    statusCode: 500,
-                    body: 'invalid segments in POST request, must be /.netlify/functions/api/123456',
-                    headers,
-                };
-            }
+            return {
+                statusCode: 500,
+                body: 'PUT request is not allowed',
+                headers,
+            };
             break;
         /* DELETE /.netlify/functions/api/123456 */
         case 'DELETE':
-            if (segments.length === 1) {
-                // event.id = segments[0];
-                return methods_1.Delete(event, dbClient, segments[0], tableName, headers);
-            }
-            else {
-                return {
-                    statusCode: 500,
-                    body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
-                    headers,
-                };
-            }
+            return {
+                statusCode: 500,
+                body: 'DELETE request is not allowed',
+                headers,
+            };
+            // if (segments.length === 1) {
+            //   // event.id = segments[0];
+            //   return Delete(event, dbClient, tableName, headers, segments[0])
+            // } else {
+            //   return {
+            //     statusCode: 500,
+            //     body: 'invalid segments in DELETE request, must be /.netlify/functions/api/123456',
+            //     headers,
+            //   }
+            // }
             break;
         /* Fallthrough case */
         default:
             return {
                 statusCode: 500,
-                body: 'unrecognized HTTP Method, must be one of GET/POST/PUT/DELETE',
+                body: 'unrecognized HTTP Method, must be one of GET/POST',
                 headers,
             };
     }
 };
+// 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Content-Length, Authorization, Accept, Cache-Control,  Origin, Referer, X-Api-Key',
