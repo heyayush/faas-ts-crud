@@ -23,10 +23,10 @@ myAWSConfig.update({
 const s3Client = new AWS.S3(myAWSConfig)
 
 const allowedOrigins = [
-  'https://heyayush.com',
-  'https://www.heyayush.com',
-  'http://heyayush.com',
-  'http://heyayush.com',
+  'https://one-shop.netlify.app',
+  'https://www.one-shop.netlify.app',
+  'http://one-shop.netlify.app',
+  'http://one-shop.netlify.app',
 ]
 
 const checkLocalhost = (str: string) => {

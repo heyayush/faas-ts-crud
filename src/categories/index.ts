@@ -43,8 +43,6 @@ const checkAllowedOrigins = (origin: string) => {
 
 export const handler = (event: APIGatewayEvent, _: Context, callback: Callback) => {
   const requestOrigin = event.headers.origin || event.headers.host
-  console.log('request from', requestOrigin)
-  console.log('method', event.httpMethod)
 
   if (!checkAllowedOrigins(requestOrigin)) {
     console.error(`Origin ${requestOrigin} is not allowed`)

@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
-const crypto_1 = __importDefault(require("crypto"));
 const activeEnv = process.env.ACTIVE_ENV || process.env.NODE_ENV || 'development';
 console.log(`Using environment config: '${activeEnv}'`);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -21,10 +20,10 @@ myAWSConfig.update({
 // Create the DynamoDB service object
 const s3Client = new aws_sdk_1.default.S3(myAWSConfig);
 const allowedOrigins = [
-    'https://heyayush.com',
-    'https://www.heyayush.com',
-    'http://heyayush.com',
-    'http://heyayush.com',
+    'https://one-shop.netlify.app',
+    'https://www.one-shop.netlify.app',
+    'http://one-shop.netlify.app',
+    'http://one-shop.netlify.app',
 ];
 const checkLocalhost = (str) => {
     if (str) {
@@ -36,21 +35,25 @@ const checkAllowedOrigins = (origin) => {
     const isAllowedOrigin = allowedOrigins.indexOf(origin) > -1;
     return isLocalhost || isAllowedOrigin;
 };
-const getSignedUrl = async (_, headers, s3Client) => {
-    const generateUUID = () => crypto_1.default.randomBytes(16).toString('hex');
-    const id = generateUUID();
+const deleteObject = async (_, headers, s3Client, id) => {
     const params = {
         Bucket: process.env.ASSETS_BUCKET_NAME || '',
         Key: id,
-        Expires: 300,
     };
     try {
         // Generating a preSignedUrl for a putObject
-        const data = await s3Client.getSignedUrlPromise('putObject', params);
+        const deleteResponse = await s3Client.deleteObject(params, (err, data) => {
+            if (err) {
+                console.log('error in deletion', err);
+            }
+            else {
+                console.log('data is', data);
+            }
+        });
         const response = {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ url: data, id: id }),
+            body: JSON.stringify({ deleteResponse: deleteResponse }),
         };
         return response;
     }
@@ -82,10 +85,10 @@ exports.handler = (event, _, callback) => {
     const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '');
     const segments = path.split('/').filter((e) => e);
     switch (event.httpMethod) {
-        case 'GET':
-            /* GET /.netlify/functions/api */
-            if (segments.length === 0) {
-                return getSignedUrl(event, headers, s3Client);
+        case 'DELETE':
+            if (segments.length === 1) {
+                const { objectId } = event.body && JSON.parse(event.body);
+                return deleteObject(event, headers, s3Client, objectId);
             }
             /* GET /.netlify/functions/api/123456 */
             //   if (segments.length === 1) {
@@ -96,7 +99,7 @@ exports.handler = (event, _, callback) => {
                 return {
                     statusCode: 500,
                     headers,
-                    body: 'too many segments in GET request',
+                    body: 'Oops something went wrong',
                 };
             }
             break;
@@ -105,7 +108,7 @@ exports.handler = (event, _, callback) => {
             return {
                 statusCode: 500,
                 headers,
-                body: 'unrecognized HTTP Method, must be a GET request',
+                body: 'unrecognized HTTP Method, must be a POST request',
             };
     }
 };

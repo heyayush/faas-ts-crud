@@ -39,8 +39,6 @@ const checkAllowedOrigins = (origin) => {
 };
 exports.handler = (event, _, callback) => {
     const requestOrigin = event.headers.origin || event.headers.host;
-    console.log('request from', requestOrigin);
-    console.log('method', event.httpMethod);
     if (!checkAllowedOrigins(requestOrigin)) {
         console.error(`Origin ${requestOrigin} is not allowed`);
         callback(null, {
