@@ -26,6 +26,9 @@ const allowedOrigins = [
     'https://www.one-shop.netlify.app',
     'http://one-shop.netlify.app',
     'http://one-shop.netlify.app',
+    'http://faas-ts-crud.netlify.app',
+    'https://faas-ts-crud.netlify.app',
+    'faas-ts-crud.netlify.app',
 ];
 const checkLocalhost = (str) => {
     if (str) {
