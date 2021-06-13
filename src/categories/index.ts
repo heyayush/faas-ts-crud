@@ -22,25 +22,15 @@ myAWSConfig.update({
 const dbClient = new AWS.DynamoDB.DocumentClient(myAWSConfig)
 const tableName = process.env.CATEGORIES_TABLE_NAME || ''
 
-const allowedOrigins = [
-  'https://one-shop.netlify.app',
-  'https://www.one-shop.netlify.app',
-  'http://one-shop.netlify.app',
-  'http://one-shop.netlify.app',
-  'http://faas-ts-crud.netlify.app',
-  'https://faas-ts-crud.netlify.app',
-  'faas-ts-crud.netlify.app',
-]
+const allowedOrigins = ['faas-ts-crud.netlify.app', 'one-shop.vercel.app']
 
 const checkLocalhost = (str: string) => {
-  if (str) {
-    return str.includes('localhost:')
-  }
+  return str.includes('http://localhost')
 }
 
-const checkAllowedOrigins = (origin: string) => {
+export const checkAllowedOrigins = (origin: string) => {
   const isLocalhost = checkLocalhost(origin)
-  const isAllowedOrigin = allowedOrigins.indexOf(origin) > -1
+  const isAllowedOrigin = allowedOrigins.some((allowedOrigin) => origin.includes(allowedOrigin))
   return isLocalhost || isAllowedOrigin
 }
 

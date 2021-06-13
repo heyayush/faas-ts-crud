@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = void 0;
+exports.handler = exports.checkAllowedOrigins = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const activeEnv = process.env.ACTIVE_ENV || process.env.NODE_ENV || 'development';
 console.log(`Using environment config: '${activeEnv}'`);
@@ -19,23 +19,13 @@ myAWSConfig.update({
 });
 // Create the DynamoDB service object
 const s3Client = new aws_sdk_1.default.S3(myAWSConfig);
-const allowedOrigins = [
-    'https://one-shop.netlify.app',
-    'https://www.one-shop.netlify.app',
-    'http://one-shop.netlify.app',
-    'http://one-shop.netlify.app',
-    'http://faas-ts-crud.netlify.app',
-    'https://faas-ts-crud.netlify.app',
-    'faas-ts-crud.netlify.app',
-];
+const allowedOrigins = ['faas-ts-crud.netlify.app', 'one-shop.vercel.app'];
 const checkLocalhost = (str) => {
-    if (str) {
-        return str.includes('localhost:');
-    }
+    return str.includes('http://localhost');
 };
-const checkAllowedOrigins = (origin) => {
+exports.checkAllowedOrigins = (origin) => {
     const isLocalhost = checkLocalhost(origin);
-    const isAllowedOrigin = allowedOrigins.indexOf(origin) > -1;
+    const isAllowedOrigin = allowedOrigins.some((allowedOrigin) => origin.includes(allowedOrigin));
     return isLocalhost || isAllowedOrigin;
 };
 const deleteObject = async (_, headers, s3Client, id) => {
@@ -71,7 +61,7 @@ const deleteObject = async (_, headers, s3Client, id) => {
 // const GetSignedUrls = async () => {}
 exports.handler = (event, _, callback) => {
     const requestOrigin = event.headers.origin || event.headers.host;
-    if (!checkAllowedOrigins(requestOrigin)) {
+    if (!exports.checkAllowedOrigins(requestOrigin)) {
         console.error('Origin not allowed');
         callback(null, {
             statusCode: 401,
